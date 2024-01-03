@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <deque>
 
 using namespace std;
 
@@ -17,6 +16,8 @@ bool newComeVisualise(vector<int>[], int&);
 void visualisation(vector<int>[], float);
 // performs simulation of fcfs algorithm
 void fcfs(vector<int>[]);
+//bubble sort by tacts for vector table {id : tacts}
+void sortVec(vector<int> []);
 // performs simulation of sjf algorithm
 void sjf(vector<int>[]);
 // performs "waiting" by counting from INT_MIN/3 to 0
@@ -58,7 +59,7 @@ int fileLoad(fstream &fInput, vector<int> tab[])
     for(auto i: firstLine)
     {
         if(i==' '||i==10 /*eol ASCII number*/)
-            taskCounter++;
+            ++taskCounter;
     }
     //cout<<(int)taskCounter; //uncomment to check is taskCounter counted properly
 
@@ -136,8 +137,10 @@ void visualisation(vector<int> tab[], float avg)
 void fcfs(vector<int> tab[])
 {
     int time=0;
+    // {waitingTime}
     vector<int> timeTab;
-    vector<int> toDraw[3];// {id : tacts : arriving}
+    // {id : tacts : arriving}
+    vector<int> toDraw[3];
     for(size_t i=0; i<tab[0].size(); ++i)
     {
         timeTab.push_back(time-tab[0][i]);
@@ -149,19 +152,19 @@ void fcfs(vector<int> tab[])
     visualisation(toDraw,avg(timeTab));
 }
 
-int minValVec(vector<int> tab[])
-{
-    int minVal=INT_MAX;
-    for(auto i: tab[1])
-    {
-        minVal=i<minVal?i:minVal;
-    }
-    return minVal;
-}
+//int minValVec(vector<int> tab[])
+//{
+//    int minVal=INT_MAX;
+//    for(auto i: tab[1])
+//    {
+//        minVal=i<minVal?i:minVal;
+//    }
+//    return minVal;
+//}
 
 void sortVec(vector<int> tab[])
 {
-    for(size_t i=1; i<tab[0].size(); i++)
+    for(size_t i=1; i<tab[0].size(); ++i)
     {
         int temp[2];
         if(tab[1][i-1]>tab[1][i])
@@ -180,16 +183,23 @@ void sjf(vector<int> tab[])
 {
     // array of processes currently available to put on processor.
     // **use only when sorted!**
-    // {id : tacts}
-    vector<int> currentlyAvailable[2];
+    // {id : tacts : arriving}
+    vector<int> currentlyAvailable[3];
+    // {waitingTime}
+    vector<int> timeTab;
+    // array for "drawing" - visualisation function
+    // {id : tacts : arriving}
+    vector<int> toDraw[3];
 
     // tacts needed to complete all processes
     int tacts=vecSum(tab[1]);
 
     // processor busy status
     bool busy=false;
+    // tacts lasts to end current process
+    int toEndCurrent=0;
 
-    // for every tact, checks what's going on in there
+    // for every tact, check what's going on in there
     for(int i=0; i<tacts; ++i)
     {
         for(size_t ii=0; ii<tab[0].size(); ++ii)
@@ -199,37 +209,47 @@ void sjf(vector<int> tab[])
             {
                 currentlyAvailable[0].push_back(tab[2][ii]);
                 currentlyAvailable[1].push_back(tab[1][ii]);
+                currentlyAvailable[2].push_back(tab[0][ii]);
+
             }
-            // array of processes sorted by remaining tacts to end
-            // {id : tacts}
-//            vector<int> ordered[2];
-            // minimal value of remaining tacts in currentlyAvailable
-//            int minVal=minValVec(currentlyAvailable);
-            // sorting processes
+            // sorting available processes by tacts
             sortVec(currentlyAvailable);
-//            for(int iii=0; iii<currentlyAvailable[0].size(); ++iii)
-//            {
-//                minVal=minValVec(currentlyAvailable);
-//                if(currentlyAvailable[1][iii]==minVal)
-//                {
-//                    ordered[0].push_back(currentlyAvailable[0][iii]);
-//                    ordered[1].push_back(currentlyAvailable[1][iii]);
-//                    currentlyAvailable[0].erase(currentlyAvailable[0].begin()+iii);
-//                    currentlyAvailable[1].erase(currentlyAvailable[1].begin()+iii);
-//                }
-//            }
-//            currentlyAvailable[0]=ordered[0];
-//            currentlyAvailable[1]=ordered[1];
-            for(size_t iii=0; iii<currentlyAvailable[0].size(); ++iii)
+        }
+
+        //loading process on processor
+        if(!busy)
+        {
+            busy=true;
+            toDraw[0].push_back(currentlyAvailable[0][0]);
+            toDraw[1].push_back(currentlyAvailable[1][0]);
+            toDraw[2].push_back(currentlyAvailable[2][0]);
+            timeTab.push_back(i-currentlyAvailable[2][0]);
+            toEndCurrent=currentlyAvailable[1][0]-1;
+            currentlyAvailable[0].erase(currentlyAvailable[0].begin());
+            currentlyAvailable[1].erase(currentlyAvailable[1].begin());
+            currentlyAvailable[2].erase(currentlyAvailable[2].begin());
+        }
+
+        else
+        {
+            --toEndCurrent;
+            if(toEndCurrent==0)
             {
-                cout<<'{'<<currentlyAvailable[0][iii]<<'|'<<currentlyAvailable[1][iii]<<"}\n";
+                busy=false;
             }
-            cout<<"...................\n";
         }
     }
+
+    visualisation(toDraw,avg(timeTab));
+
+//    for(size_t i=0; i<toDraw[0].size(); ++i)
+//    {
+//        cout<<'{'<<toDraw[0][i]<<'|'<<toDraw[1][i]<<'|'<<toDraw[2][i]<<"}\n";
+//    }
+//    cout<<"...................\n";
 }
 
 void wait()
 {
-    for(int i=INT_MIN/3;i<0; i++);
+    for(int i=INT_MIN/3;i<0; ++i);
 }
