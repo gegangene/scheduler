@@ -1,31 +1,42 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <deque>
 
 using namespace std;
 
-float avg(vector<int>&); //returns arithmetic average from values in vector
-int fileLoad(fstream&, vector<int>[]); //loads file data to table of vectors
+// loads file data to table of vectors
+int fileLoad(fstream&, vector<int>[]);
+// sums all values of given vector
 int vecSum(vector<int>&);
-bool newComeVisualise(vector<int>[], int);
-void visualisation(vector<int>[]);
-float fcfs(vector<int>[]); //performs simulation of fcfs algorithm
-int sjf(vector<int>[]); //performs simulation of sjf algorithm
+// returns arithmetic average from values in vector
+float avg(vector<int>&);
+// shows are they new processes gained in current tact
+bool newComeVisualise(vector<int>[], int&);
+// visualises work of algorithm based on given vector {id : tacts : arrivingTact} and result [float]
+void visualisation(vector<int>[], float);
+// performs simulation of fcfs algorithm
+void fcfs(vector<int>[]);
+// performs simulation of sjf algorithm
+void sjf(vector<int>[]);
+// performs "waiting" by counting from INT_MIN/3 to 0
 void wait();
 
 int main() {
     fstream fInput("../input.txt",ios::in), fOutput("../output.txt",ios::out);
-    const size_t size=2;
+    //size of data array
+    const size_t size=3;
+    // array of processes details read from input file
+    // {arriving : tacts : id}
     vector<int> dataArr[size];
     fileLoad(fInput, dataArr);
+
     cout<<"Choose an algorithm:\n\t1 — FCFS\n\t2 — SJF\n>> ";
-    int userChoose;
-    userChoose=getchar();
+    int userChoose=getchar();
     switch(userChoose)
     {
         case '1':
             fcfs(dataArr);
-//            cout<<"|"<<fcfs(dataArr)<<"|";
             break;
         case '2':
             sjf(dataArr);
@@ -41,32 +52,28 @@ int fileLoad(fstream &fInput, vector<int> tab[])
 {
     string firstLine;
     getline(fInput, firstLine);
-    char taskCounter=firstLine.length()==0?0:1;
+    // holds value of how many tasks there is written in file
+    int taskCounter=firstLine.length()==0?0:1;
+
     for(auto i: firstLine)
     {
         if(i==' '||i==10 /*eol ASCII number*/)
             taskCounter++;
     }
     //cout<<(int)taskCounter; //uncomment to check is taskCounter counted properly
+
+    // temporary variable to hold value read from file
     int temp;
     fInput.seekg(0); //revert to beginning when we know how many processes we have to handle with
     for(size_t ipre=0; ipre<2; ++ipre) //as we have only *size* lines which interests us, i handle only them
         for(int i=0; i<taskCounter; ++i)
         {
+            if(ipre<1)
+                tab[2].push_back(i);
             fInput>>temp;
             tab[ipre].push_back(temp);
         }
     return 0;
-}
-
-float avg(vector<int> &tab)
-{
-    int sum=0;
-    for(auto &i: tab)
-    {
-        sum+=i;
-    }
-    return static_cast<float>(sum)/static_cast<float>(tab.size());
 }
 
 int vecSum(vector<int> &tab)
@@ -77,7 +84,12 @@ int vecSum(vector<int> &tab)
     return sum;
 }
 
-bool newComeVisualise(vector<int> tab[], int tact)
+float avg(vector<int> &tab)
+{
+    return static_cast<float>(vecSum(tab))/static_cast<float>(tab.size());
+}
+
+bool newComeVisualise(vector<int> tab[], int &tact)
 {
     string processes;
     bool gained_=false;
@@ -96,10 +108,12 @@ bool newComeVisualise(vector<int> tab[], int tact)
     return gained_;
 }
 
-void visualisation(vector<int> tab[])
+void visualisation(vector<int> tab[], float avg)
 {
-    //tab {so-called number of process' : tacts : tactOfBeginning}
-    cout<<"tact\tpr. no\tremaining tacts\n--------------------------------------";
+    cout<<"average waiting time: "<<avg<<"\n\n";
+    cout<<"visualisation of algorithm:\n";
+    // tab : {so-called number of process : tacts : tactOfBeginning}
+    cout<<"tact\tid\tremaining tacts to end\n--------------------------------------";
     int tact=0;
     for(int i=0; i</*sum*/tab[0].size(); ++i)
     {
@@ -119,27 +133,100 @@ void visualisation(vector<int> tab[])
 }
 
 
-float fcfs(vector<int> tab[])
+void fcfs(vector<int> tab[])
 {
     int time=0;
     vector<int> timeTab;
-    vector<int> toDraw[3];
+    vector<int> toDraw[3];// {id : tacts : arriving}
     for(size_t i=0; i<tab[0].size(); ++i)
     {
         timeTab.push_back(time-tab[0][i]);
         time+=tab[1][i];
-        toDraw[0].push_back(i);
     }
+    toDraw[0]=tab[2];
     toDraw[1]=tab[1];
     toDraw[2]=tab[0];
-    visualisation(toDraw);
-    return avg(timeTab);
+    visualisation(toDraw,avg(timeTab));
 }
 
-int sjf(vector<int> tab[])
+int minValVec(vector<int> tab[])
 {
+    int minVal=INT_MAX;
+    for(auto i: tab[1])
+    {
+        minVal=i<minVal?i:minVal;
+    }
+    return minVal;
+}
 
-    return 0;
+void sortVec(vector<int> tab[])
+{
+    for(size_t i=1; i<tab[0].size(); i++)
+    {
+        int temp[2];
+        if(tab[1][i-1]>tab[1][i])
+        {
+            temp[0]=tab[0][i-1];
+            temp[1]=tab[1][i-1];
+            tab[0][i-1]=tab[0][i];
+            tab[1][i-1]=tab[1][i];
+            tab[0][i]=temp[0];
+            tab[1][i]=temp[1];
+        }
+    }
+}
+
+void sjf(vector<int> tab[])
+{
+    // array of processes currently available to put on processor.
+    // **use only when sorted!**
+    // {id : tacts}
+    vector<int> currentlyAvailable[2];
+
+    // tacts needed to complete all processes
+    int tacts=vecSum(tab[1]);
+
+    // processor busy status
+    bool busy=false;
+
+    // for every tact, checks what's going on in there
+    for(int i=0; i<tacts; ++i)
+    {
+        for(size_t ii=0; ii<tab[0].size(); ++ii)
+        {
+            // loading processes gained in current tact
+            if(i==tab[0][ii])
+            {
+                currentlyAvailable[0].push_back(tab[2][ii]);
+                currentlyAvailable[1].push_back(tab[1][ii]);
+            }
+            // array of processes sorted by remaining tacts to end
+            // {id : tacts}
+//            vector<int> ordered[2];
+            // minimal value of remaining tacts in currentlyAvailable
+//            int minVal=minValVec(currentlyAvailable);
+            // sorting processes
+            sortVec(currentlyAvailable);
+//            for(int iii=0; iii<currentlyAvailable[0].size(); ++iii)
+//            {
+//                minVal=minValVec(currentlyAvailable);
+//                if(currentlyAvailable[1][iii]==minVal)
+//                {
+//                    ordered[0].push_back(currentlyAvailable[0][iii]);
+//                    ordered[1].push_back(currentlyAvailable[1][iii]);
+//                    currentlyAvailable[0].erase(currentlyAvailable[0].begin()+iii);
+//                    currentlyAvailable[1].erase(currentlyAvailable[1].begin()+iii);
+//                }
+//            }
+//            currentlyAvailable[0]=ordered[0];
+//            currentlyAvailable[1]=ordered[1];
+            for(size_t iii=0; iii<currentlyAvailable[0].size(); ++iii)
+            {
+                cout<<'{'<<currentlyAvailable[0][iii]<<'|'<<currentlyAvailable[1][iii]<<"}\n";
+            }
+            cout<<"...................\n";
+        }
+    }
 }
 
 void wait()
