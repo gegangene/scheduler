@@ -232,11 +232,11 @@ void sjf(vector<int> tab[])
 
         else
         {
-            --toEndCurrent;
             if(toEndCurrent==0)
             {
                 busy=false;
             }
+            --toEndCurrent;
         }
     }
 
