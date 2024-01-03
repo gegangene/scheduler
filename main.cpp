@@ -99,7 +99,7 @@ bool newComeVisualise(vector<int> tab[], int &tact)
         if(tab[2][i]==tact)
         {
             gained_=true;
-            processes+=to_string(i)+"  ";
+            processes+=to_string(tab[0][i])+"  ";
         }
     }
     if(gained_)
@@ -114,17 +114,17 @@ void visualisation(vector<int> tab[], float avg)
     cout<<"average waiting time: "<<avg<<"\n\n";
     cout<<"visualisation of algorithm:\n";
     // tab : {so-called number of process : tacts : tactOfBeginning}
-    cout<<"tact\tid\tremaining tacts to end\n--------------------------------------";
+    cout<<"tact\tid\twaited for ... tacts\n--------------------------------------";
     int tact=0;
     for(int i=0; i</*sum*/tab[0].size(); ++i)
     {
         bool showed_=false;
         for(int ii=0; ii<tab[1][i]; ++ii)
         {
-            string tactvisual=newComeVisualise(tab,tact)?"":to_string(tact);
+            string tactVisual=newComeVisualise(tab,tact)?"":to_string(tact);
             if(!showed_)
             {
-                cout<<"\n"<<tactvisual<<"\t'"<<tab[0][i]<<"'\t"<<tab[1][i]-ii-1;
+                cout<<"\n"<<tactVisual<<"\t'"<<tab[0][i]<<"'\t"<<tact-tab[2][i];
                 showed_=true;
                 wait();
             }
@@ -152,29 +152,22 @@ void fcfs(vector<int> tab[])
     visualisation(toDraw,avg(timeTab));
 }
 
-//int minValVec(vector<int> tab[])
-//{
-//    int minVal=INT_MAX;
-//    for(auto i: tab[1])
-//    {
-//        minVal=i<minVal?i:minVal;
-//    }
-//    return minVal;
-//}
-
 void sortVec(vector<int> tab[])
 {
     for(size_t i=1; i<tab[0].size(); ++i)
     {
-        int temp[2];
+        int temp[3];
         if(tab[1][i-1]>tab[1][i])
         {
             temp[0]=tab[0][i-1];
             temp[1]=tab[1][i-1];
+            temp[2]=tab[2][i-1];
             tab[0][i-1]=tab[0][i];
             tab[1][i-1]=tab[1][i];
+            tab[2][i-1]=tab[2][i];
             tab[0][i]=temp[0];
             tab[1][i]=temp[1];
+            tab[2][i]=temp[2];
         }
     }
 }
@@ -194,8 +187,8 @@ void sjf(vector<int> tab[])
     // tacts needed to complete all processes
     int tacts=vecSum(tab[1]);
 
-    // processor busy status
-    bool busy=false;
+    // processor busy status indicator
+    bool busy_=false;
     // tacts lasts to end current process
     int toEndCurrent=0;
 
@@ -217,9 +210,9 @@ void sjf(vector<int> tab[])
         }
 
         //loading process on processor
-        if(!busy)
+        if(!busy_)
         {
-            busy=true;
+            busy_=true;
             toDraw[0].push_back(currentlyAvailable[0][0]);
             toDraw[1].push_back(currentlyAvailable[1][0]);
             toDraw[2].push_back(currentlyAvailable[2][0]);
@@ -234,19 +227,13 @@ void sjf(vector<int> tab[])
         {
             if(toEndCurrent==0)
             {
-                busy=false;
+                busy_=false;
             }
             --toEndCurrent;
         }
     }
 
     visualisation(toDraw,avg(timeTab));
-
-//    for(size_t i=0; i<toDraw[0].size(); ++i)
-//    {
-//        cout<<'{'<<toDraw[0][i]<<'|'<<toDraw[1][i]<<'|'<<toDraw[2][i]<<"}\n";
-//    }
-//    cout<<"...................\n";
 }
 
 void wait()
