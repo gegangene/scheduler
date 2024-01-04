@@ -5,7 +5,7 @@
 using namespace std;
 
 // loads file data to table of vectors
-int fileLoad(fstream&, vector<int>[]);
+char fileLoad(fstream&, vector<int>[]);
 // sums all values of given vector
 int vecSum(vector<int>&);
 // returns arithmetic average from values in vector
@@ -25,14 +25,35 @@ void wait();
 
 int main() {
     fstream fInput("../input.txt",ios::in), fOutput("../output.txt",ios::out);
+    if(!fInput.good())
+    {
+        cout<<"no input file!";
+        return 1;
+    }
     //size of data array
-    const size_t size=3;
+    const size_t size=6;
     // array of processes details read from input file
     // {arriving : tacts : id}
     vector<int> dataArr[size];
-    fileLoad(fInput, dataArr);
+    char fStatus=fileLoad(fInput, dataArr);
+    switch(fStatus)
+    {
+        case 0:
+            break;
+        case 1:
+            cout<<"not enough processes placed in file";
+            return 1;
+        case 2:
+            cout<<"not corresponding number of arriving tacts and duration of processes";
+            return 1;
+        case 3 ... 5:
+            break;
+        default:
+            cout<<"file data error";
+            return 1;
+    }
 
-    cout<<"Choose an algorithm:\n\t1 — FCFS\n\t2 — SJF\n>> ";
+    cout<<"Choose an algorithm:\n\t1 — FCFS\n\t2 — SJF\n\t3 — Priority-based\n>> ";
     int userChoose=getchar();
     switch(userChoose)
     {
@@ -42,6 +63,22 @@ int main() {
         case '2':
             sjf(dataArr);
             break;
+        case '3':
+            switch(fStatus)
+            {
+                case 3:
+                    cout<<"lack of priorities in file.";
+                    return 1;
+                case 4:
+                    cout<<"lack of time quantum for priority algorithm in file.";
+                    return 1;
+                case 5:
+                    cout<<"not corresponding number of priorities and processes in file.";
+                    return 1;
+                default:
+                    break;
+            }
+            break;
         default:
             cout<<"bad input.";
             return 1;
@@ -49,31 +86,80 @@ int main() {
     return 0;
 }
 
-int fileLoad(fstream &fInput, vector<int> tab[])
+char fileLoad(fstream &fInput, vector<int> tab[])
 {
-    string firstLine;
-    getline(fInput, firstLine);
-    // holds value of how many tasks there is written in file
-    int taskCounter=firstLine.length()==0?0:1;
+    //line from file
+    string line;
+    if(!getline(fInput, line))
+        return 99;
 
-    for(auto i: firstLine)
+    fInput.seekg(0);
+    char lineCounter=0;
+    while(!fInput.eof()&&lineCounter<5)
     {
-        if(i==' '||i==10 /*eol ASCII number*/)
-            ++taskCounter;
-    }
-    //cout<<(int)taskCounter; //uncomment to check is taskCounter counted properly
-
-    // temporary variable to hold value read from file
-    int temp;
-    fInput.seekg(0); //revert to beginning when we know how many processes we have to handle with
-    for(size_t ipre=0; ipre<2; ++ipre) //as we have only *size* lines which interests us, i handle only them
-        for(int i=0; i<taskCounter; ++i)
+        getline(fInput,line);
+        string temp;
+		int processCounter=0;
+        for(auto &i: line)
         {
-            if(ipre<1)
-                tab[2].push_back(i);
-            fInput>>temp;
-            tab[ipre].push_back(temp);
+            if(i==' '||&i==&line[line.size()-1])
+            {
+                if(&i==&line[line.size()-1])
+                    temp+=i;
+
+				int lineTemp=lineCounter>1?lineCounter+1:lineCounter;
+                tab[lineTemp].push_back(stoi(temp));
+
+                if(lineCounter==0)
+                {
+					tab[2].push_back(processCounter);
+//					cout<<"|"<<temp<<"|"<<tab[2][processCounter]<<"|"<<lineTemp<<"|\n";
+					processCounter++;
+                }
+
+				if(lineCounter>2)
+				{
+					break;
+				}
+                temp="";
+            }
+            else
+            {
+                temp+=i;
+            }
         }
+        ++lineCounter;
+    }
+
+
+//    cout<<tab[0].size()<<"\t"<<tab[1].size()<<endl;
+
+    // checking is there corresponding number of arrivings and tacts
+    if(tab[0].size()!=tab[1].size())
+    {
+        return 2;
+    }
+    // checking is there necessary number of processes
+    if(tab[0].size()<15||tab[1].size()<15)
+    {
+        return 1;
+    }
+    // checking is there a priorities at all
+    if(lineCounter<3)
+    {
+        return 3;
+    }
+    // checking is there corresponding number of arrivings and priorities
+    if(tab[0].size()!=tab[2].size())
+    {
+        return 5;
+    }
+    //checking is time quantum exist
+    else if(lineCounter<4)
+    {
+        return 4;
+    }
+
     return 0;
 }
 
