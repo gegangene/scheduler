@@ -16,10 +16,12 @@ bool newComeVisualise(vector<int>[], int&);
 void visualisation(vector<int>[], float);
 // performs simulation of fcfs algorithm
 void fcfs(vector<int>[]);
-//bubble sort by tacts for vector table {id : tacts}
-void sortVec(vector<int> []);
+// bubble sort by tacts for vector table {id : tacts}
+void sortVec(vector<int>[], char, char);
 // performs simulation of sjf algorithm
 void sjf(vector<int>[]);
+// priority algorithm simulation
+void priority(vector<int>[]);
 // performs "waiting" by counting from INT_MIN/3 to 0
 void wait();
 
@@ -53,7 +55,7 @@ int main() {
             return 1;
     }
 
-    cout<<"Choose an algorithm:\n\t1 — FCFS\n\t2 — SJF\n\t3 — Priority-based\n>> ";
+    cout<<"Choose an algorithm:\n\t1 — FCFS\n\t2 — SJF\n\t3 — Priority SJF\n>> ";
     int userChoose=getchar();
     switch(userChoose)
     {
@@ -78,6 +80,7 @@ int main() {
                 default:
                     break;
             }
+			priority(dataArr);
             break;
         default:
             cout<<"bad input.";
@@ -185,7 +188,7 @@ bool newComeVisualise(vector<int> tab[], int &tact)
         if(tab[2][i]==tact)
         {
             gained_=true;
-            processes+=to_string(tab[0][i])+"  ";
+            processes+='P'+to_string(tab[0][i])+"  ";
         }
     }
     if(gained_)
@@ -210,7 +213,7 @@ void visualisation(vector<int> tab[], float avg)
             string tactVisual=newComeVisualise(tab,tact)?"":to_string(tact);
             if(!showed_)
             {
-                cout<<"\n"<<tactVisual<<"\t'"<<tab[0][i]<<"'\t"<<tact-tab[2][i];
+                cout<<"\n"<<tactVisual<<"\t'P"<<tab[0][i]<<"'\t"<<tact-tab[2][i];
                 showed_=true;
                 wait();
             }
@@ -238,22 +241,19 @@ void fcfs(vector<int> tab[])
     visualisation(toDraw,avg(timeTab));
 }
 
-void sortVec(vector<int> tab[])
+void sortVec(vector<int> tab[], char row, char noOfRows)
 {
     for(size_t i=1; i<tab[0].size(); ++i)
     {
-        int temp[3];
-        if(tab[1][i-1]>tab[1][i])
+        int temp[noOfRows];
+        if(tab[row][i-1]>tab[row][i])
         {
-            temp[0]=tab[0][i-1];
-            temp[1]=tab[1][i-1];
-            temp[2]=tab[2][i-1];
-            tab[0][i-1]=tab[0][i];
-            tab[1][i-1]=tab[1][i];
-            tab[2][i-1]=tab[2][i];
-            tab[0][i]=temp[0];
-            tab[1][i]=temp[1];
-            tab[2][i]=temp[2];
+			for(int ii=0; ii<noOfRows; ++ii)
+			{
+				temp[ii]=tab[ii][i-1];
+				tab[ii][i-1]=tab[ii][i];
+				tab[ii][i]=temp[ii];
+			}
         }
     }
 }
@@ -292,7 +292,7 @@ void sjf(vector<int> tab[])
 
             }
             // sorting available processes by tacts
-            sortVec(currentlyAvailable);
+            sortVec(currentlyAvailable,1,3);
         }
 
         //loading process on processor
@@ -320,6 +320,86 @@ void sjf(vector<int> tab[])
     }
 
     visualisation(toDraw,avg(timeTab));
+}
+
+void priority(vector<int> tab[])
+{
+	// array of processes currently available to put on processor.
+	// **use only when sorted!**
+	// {id : tacts : arriving : priority}
+	vector<int> currentlyAvailable[4];
+
+	// vector for waiting times
+	// {waitingTime}
+	vector<int> timeTab;
+	// array for "drawing" - visualisation function
+	// {id : tacts : arriving}
+	vector<int> toDraw[3];
+
+	// tacts needed to complete all processes
+	int tacts=vecSum(tab[1]);
+
+	// processor busy status indicator
+	bool busy_=false;
+	// tacts lasts to end current process
+	int toEndCurrent=0;
+
+	// for every tact, check what's going on in there
+	for(int i=0; i<tacts; ++i)
+	{
+		for(size_t ii=0; ii<tab[0].size(); ++ii)
+		{
+			// loading processes gained in current tact
+			if(i==tab[0][ii])
+			{
+				currentlyAvailable[0].push_back(tab[2][ii]);
+				currentlyAvailable[1].push_back(tab[1][ii]);
+				currentlyAvailable[2].push_back(tab[0][ii]);
+				currentlyAvailable[3].push_back(tab[3][ii]);
+
+			}
+			// sorting available processes by tacts and then processes (which correspondents as prioritizing processes priorities)
+			sortVec(currentlyAvailable,1,4);
+			sortVec(currentlyAvailable,3,4);
+		}
+
+		for(int ii=0; ii<currentlyAvailable[0].size(); ++ii)
+		{
+			if((i-currentlyAvailable[2][ii])%tab[4][0]==0 && i!=0)
+			{
+				if(currentlyAvailable[3][ii]>0)
+				{
+					currentlyAvailable[3][ii]--;
+				}
+			}
+		}
+
+		//loading process on processor
+		if(!busy_)
+		{
+			busy_=true;
+			for(int ii=0; ii<3; ii++)
+			{
+				toDraw[ii].push_back(currentlyAvailable[ii][0]);
+			}
+			timeTab.push_back(i-currentlyAvailable[2][0]);
+			toEndCurrent=currentlyAvailable[1][0]-1;
+			for(auto &ii: currentlyAvailable)
+			{
+				ii.erase(ii.begin());
+			}
+		}
+
+		else
+		{
+			if(toEndCurrent==0)
+			{
+				busy_=false;
+			}
+			--toEndCurrent;
+		}
+	}
+	visualisation(toDraw,avg(timeTab));
 }
 
 void wait()
