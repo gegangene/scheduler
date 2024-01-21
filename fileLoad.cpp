@@ -53,7 +53,7 @@ char fileLoad(std::fstream &fInput, std::vector<int> tab[])
 	}
 
 
-//    cout<<tab[0].size()<<"\t"<<tab[1].size()<<endl;
+//    cout<<tab[0].dataArrSize()<<"\t"<<tab[1].dataArrSize()<<endl;
 
 	// checking is there corresponding number of arrivings and tacts
 	if(tab[0].size()!=tab[1].size())

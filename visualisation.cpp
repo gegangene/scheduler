@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include "visualisation.h"
+#include "raport.h"
 
 using namespace std;
 
@@ -23,7 +24,7 @@ bool newComeVisualise(vector<int> tab[], int &tact)
 	if(gained_)
 	{
 		cout<<"\n"<<tact<<"\tgained new processes: "<<processes;
-		wait();
+		wait(1);
 	}
 	return gained_;
 }
@@ -31,7 +32,6 @@ bool newComeVisualise(vector<int> tab[], int &tact)
 void visualisation(vector<int> tab[], float avg)
 {
 	int tact=0;
-	cout<<"average waiting time: "<<avg<<"\n\n";
 	cout<<"visualisation of algorithm:\n";
 	// tab : {so-called number of process : tacts : tactOfBeginning}
 	cout<<"tact (starting tact)\t\t\t\t(ending tact):\n--------------------------------------";
@@ -70,14 +70,16 @@ void visualisation(vector<int> tab[], float avg)
 				cout<<"\t|     Process duration: "<<tab[1][i]<<spacesStr<<"|\n";
 				cout<<"\t|-------------------------------|\t"<<tact+tab[1][i]<<"\n";
 				showed_=true;
-				wait();
+//				wait(tab[1][i]);
 			}
 			tact++;
 		}
 	}
+	cout<<"\n\naverage waiting time: "<<avg;
+	generateReport(tab, avg);
 }
 
-void wait()
+void wait(int givenInt)
 {
-	for(long i=INT_MIN/3;i<0; ++i);
+	for(long i=LONG_MIN/100000000000*givenInt;i<0; ++i);
 }

@@ -9,7 +9,7 @@
 bool newComeVisualise(std::vector<int>[], int&);
 // visualises work of algorithm based on given vector {id : tacts : arrivingTact} and result [float]
 void visualisation(std::vector<int>[], float);
-// performs "waiting" by counting from INT_MIN/3 to 0
-void wait();
+// performs "waiting" by counting from INT_MIN/(5*givenInt) to 0
+void wait(int);
 
 #endif //OS_2_1_VISUALISATION_H

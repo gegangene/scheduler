@@ -9,6 +9,7 @@
 
 void fcfs(std::vector<int> tab[])
 {
+	sortVec(tab,0,4);
 	int time=0;
 	// {waitingTime}
 	std::vector<int> timeTab;
