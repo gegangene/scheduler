@@ -61,7 +61,7 @@ void mainReport(vector<int> tab[], float avg, fstream &fOutput)
 		{
 			if(!showed_)
 			{
-				fOutput<<"\n"<<tact<<"\t\t"<<tab[0][i]<<"\t\t"<<tact-tab[2][i];
+				fOutput<<"\n"<<tact<<"\t"<<tab[0][i]<<"\t"<<tact-tab[2][i];
 				showed_=true;
 			}
 			tact++;
@@ -87,7 +87,7 @@ void mainReport(vector<int> tab[], float avg, fstream &fOutput, vector<int> prio
 		{
 			if(!showed_)
 			{
-				fOutput<<"\n"<<tact<<"\t\t"<<tab[0][i]<<"\t\t"<<tact-tab[2][i]<<"\t\t\t\t"<<tab[3][i];
+				fOutput<<"\n"<<tact<<"\t"<<tab[0][i]<<"\t"<<tact-tab[2][i]<<"\t\t"<<tab[3][i];
 				showed_=true;
 			}
 			tact++;
