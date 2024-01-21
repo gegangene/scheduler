@@ -105,7 +105,7 @@ void mainReport(vector<int> tab[], float avg, fstream &fOutput, vector<int> prio
 
 void generateReport(vector<int> tab[], float avg)
 {
-	fstream fOutput("../output.txt",ios::out);
+	fstream fOutput("output.txt",ios::out);
 	mainReport(tab,avg,fOutput);
 }
 

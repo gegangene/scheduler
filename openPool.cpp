@@ -15,7 +15,7 @@ void processAdd(std::vector<int> tab[])
 	std::cout<<"Put duration time of your process\n>> ";
 	int tacts;
 	std::cin>>tacts;
-	std::cout<<"Put priority of your process (0 — greatest; 255 — lowest)\n>> ";
+	std::cout<<"Put priority of your process (0 - greatest; 255 - lowest)\n>> ";
 	int prior;
 	std::cin>>prior;
 	tab[0].push_back(onTact);

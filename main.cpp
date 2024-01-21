@@ -14,7 +14,7 @@ using namespace std;
 char menu(vector<int> dataArr[], char fStatus);
 
 int main() {
-    fstream fInput("../input.txt",ios::in);
+    fstream fInput("input.txt",ios::in);
     if(!fInput.good())
     {
         cout<<"no input file!";
@@ -52,7 +52,7 @@ int main() {
 
 char menu(vector<int> dataArr[], char fStatus)
 {
-	cout<<"Choose an option:\n\t1 — FCFS\n\t2 — SJF\n\t3 — Priority SJF\n\t4 — Add extra process\n>> ";
+	cout<<"Choose an option:\n\t1 - FCFS\n\t2 - SJF\n\t3 - Priority SJF\n\t4 - Add extra process\n>> ";
 	char userChoose=static_cast<char>(getchar());
 
 	switch(userChoose)

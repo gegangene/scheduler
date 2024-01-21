@@ -15,7 +15,7 @@ void fcfs(std::vector<int> tab[])
 	std::vector<int> timeTab;
 	// {id : tacts : arriving}
 	std::vector<int> toDraw[3];
-	for(size_t i=0; i<tab[0].size(); ++i)
+	for(std::size_t i=0; i<tab[0].size(); ++i)
 	{
 		timeTab.push_back(time-tab[0][i]);
 		time+=tab[1][i];

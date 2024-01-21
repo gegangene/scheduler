@@ -20,8 +20,8 @@ float avg(std::vector<int> &tab)
 
 void sortVec(std::vector<int> tab[], char row, char noOfRows)
 {
-	for(size_t ipre=1; ipre<tab[0].size(); ++ipre)
-		for(size_t i=1; i<tab[0].size(); ++i)
+	for(std::size_t ipre=1; ipre<tab[0].size(); ++ipre)
+		for(std::size_t i=1; i<tab[0].size(); ++i)
 		{
 			int temp[noOfRows];
 			if(tab[row][i-1]>tab[row][i])

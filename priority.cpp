@@ -51,7 +51,7 @@ void priority(std::vector<int> tab[])
 			}
 		}
 
-		for(size_t ii=0; ii<tab[0].size(); ++ii)
+		for(std::size_t ii=0; ii<tab[0].size(); ++ii)
 		{
 			// loading processes gained in current tact
 			if(i==tab[0][ii])

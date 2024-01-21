@@ -2,6 +2,7 @@
 // Created by Bartłomiej Pruszczyk on 13/01/2024.
 //
 
+#include <climits>
 #include <vector>
 #include <iostream>
 #include "visualisation.h"
@@ -48,7 +49,7 @@ void visualisation(vector<int> tab[], float avg)
 				string afterGained=gainedNew_?"\n":"";
 				cout<<afterGained;
 				cout<<"\n"<<tact<<"\t|-------------------------------|\n";
-				size_t spacesNo=15-to_string(tab[0][i]).size();
+				std::size_t spacesNo=15-to_string(tab[0][i]).size();
 				string spacesStr=string(spacesNo,' ');
 				cout<<"\t|           PID: "<<tab[0][i]<<spacesStr<<"|\n";
 				cout<<"\t|-------------------------------|\n";
@@ -63,13 +64,16 @@ void visualisation(vector<int> tab[], float avg)
 				cout<<"\t|     Process duration: "<<tab[1][i]<<spacesStr<<"|\n";
 				cout<<"\t|-------------------------------|\t"<<tact+tab[1][i]<<"\n";
 				showed_=true;
-//				wait(tab[1][i]);
+				wait(tab[1][i]);
 			}
 			tact++;
 		}
 	}
 	cout<<"\n\naverage waiting time: "<<avg;
 	generateReport(tab, avg);
+	cout<<"\n\n\tPress ENTER to exit";
+	cin.ignore();
+	getchar();
 }
 
 void visualisation(vector<int> tab[], float avg, vector<int> priorityChanges[])
@@ -91,7 +95,7 @@ void visualisation(vector<int> tab[], float avg, vector<int> priorityChanges[])
 				string afterGained=gainedNew_?"\n":"";
 				cout<<afterGained;
 				cout<<"\n"<<tact<<"\t|-------------------------------|\n";
-				size_t spacesNo=15-to_string(tab[0][i]).size();
+				std::size_t spacesNo=15-to_string(tab[0][i]).size();
 				string spacesStr=string(spacesNo,' ');
 				cout<<"\t|           PID: "<<tab[0][i]<<spacesStr<<"|\n";
 				cout<<"\t|-------------------------------|\n";
@@ -110,13 +114,16 @@ void visualisation(vector<int> tab[], float avg, vector<int> priorityChanges[])
 				cout<<"\t|          Priority: "<<tab[3][i]<<spacesStr<<"|\n";
 				cout<<"\t|-------------------------------|\t"<<tact+tab[1][i]<<"\n";
 				showed_=true;
-//				wait(tab[1][i]);
+				wait(tab[1][i]);
 			}
 			tact++;
 		}
 	}
 	cout<<"\n\naverage waiting time: "<<avg;
 	generateReport(tab, avg, priorityChanges);
+	cout<<"\n\n\tPress ENTER to exit";
+	cin.ignore();
+	getchar();
 }
 
 void wait(int givenInt)
