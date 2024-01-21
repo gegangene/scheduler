@@ -18,8 +18,11 @@ void priority(std::vector<int> tab[])
 	// {waitingTime}
 	std::vector<int> timeTab;
 	// array for "drawing" - visualisation function
-	// {id : tacts : arriving}
-	std::vector<int> toDraw[3];
+	// {id : tacts : arriving : priority}
+	std::vector<int> toDraw[4];
+	// array for priority changes
+	// {id : newPriority : tact}
+	std::vector<int> priorityChanges[3];
 
 	// tacts needed to complete all processes
 	int tacts=vecSum(tab[1]);
@@ -40,7 +43,10 @@ void priority(std::vector<int> tab[])
 				if(currentlyAvailable[3][ii]>0)
 				{
 					currentlyAvailable[3][ii]--;
-					//cout<<"increased priority of process no "<<currentlyAvailable[0][ii]<<" sat tact "<<i<<". current priority: "<<currentlyAvailable[3][ii]<<"\n";
+					//cout<<"increased priority of process no "<<currentlyAvailable[0][ii]<<" at tact "<<i<<". current priority: "<<currentlyAvailable[3][ii]<<"\n";
+					priorityChanges[0].push_back(currentlyAvailable[0][ii]);
+					priorityChanges[1].push_back(currentlyAvailable[3][ii]);
+					priorityChanges[2].push_back(i);
 				}
 			}
 		}
@@ -54,7 +60,6 @@ void priority(std::vector<int> tab[])
 				currentlyAvailable[1].push_back(tab[1][ii]);
 				currentlyAvailable[2].push_back(tab[0][ii]);
 				currentlyAvailable[3].push_back(tab[3][ii]);
-
 			}
 		}
 
@@ -66,7 +71,7 @@ void priority(std::vector<int> tab[])
 		if(!busy_)
 		{
 			busy_=true;
-			for(int ii=0; ii<3; ii++)
+			for(int ii=0; ii<4; ii++)
 			{
 				toDraw[ii].push_back(currentlyAvailable[ii][0]);
 			}
@@ -87,5 +92,5 @@ void priority(std::vector<int> tab[])
 			--toEndCurrent;
 		}
 	}
-	visualisation(toDraw,avg(timeTab));
+	visualisation(toDraw,avg(timeTab),priorityChanges);
 }

@@ -1,26 +1,30 @@
-average waiting time: 124.733
+average waiting time: 97.8667
 
-tact	PID	waited for ... tacts
---------------------------------------
-0	gained new processes: 0  1  
-	0	0
-1	gained new processes: 2  3  4  5  
+tact	PID		waiting time
+-------------------------------
+0		1		0
+22		2		21
+25		13		19
+28		11		24
+39		3		38
+51		6		49
+64		14		58
+78		8		74
+95		12		90
+113		9		109
+132		5		131
+153		7		150
+176		4		175
+201		0		201
+228		10		224
+
+important changes during the operation of the simulation:
+Tact:	What happened:
+------------------------------------------------------------
+0	gained new processes: 1  0  
+1	gained new processes: 2  3  5  4  
 2	gained new processes: 6  
 3	gained new processes: 7  
-4	gained new processes: 8  9  10  11  
+4	gained new processes: 11  8  9  10  
 5	gained new processes: 12  
 6	gained new processes: 13  14  
-27	1	27
-49	2	48
-52	3	51
-64	4	63
-89	5	88
-110	6	108
-123	7	120
-146	8	142
-163	9	159
-182	10	178
-209	11	205
-220	12	215
-238	13	232
-241	14	235

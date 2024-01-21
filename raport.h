@@ -5,6 +5,7 @@
 #ifndef OS_2_1_RAPORT_H
 #define OS_2_1_RAPORT_H
 
-void generateReport(std::vector<int> tab[], float avg);
+void generateReport(std::vector<int>[], float);
+void generateReport(std::vector<int>[], float, std::vector<int>[]);
 
 #endif //OS_2_1_RAPORT_H
